@@ -34,8 +34,11 @@ export async function saveCalculation(params: SaveCalculationParams): Promise<st
       }
     });
 
+    // Exclude id from saved data since it will be derived from document ID
+    const { id, ...productDataWithoutId } = params.productData;
+    
     const productData = {
-      ...params.productData,
+      ...productDataWithoutId,
       accessories: selectedAccessories,
       totalCost: params.calculations.totalCost,
       sellingPrice: params.calculations.sellingPrice,
