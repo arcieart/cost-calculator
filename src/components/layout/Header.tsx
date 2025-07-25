@@ -9,12 +9,7 @@ interface HeaderProps {
   onLogout: () => void;
 }
 
-export function Header({
-  userEmail,
-  darkMode,
-  onToggleDarkMode,
-  onLogout,
-}: HeaderProps) {
+export function Header({ userEmail, onToggleDarkMode, onLogout }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto">
