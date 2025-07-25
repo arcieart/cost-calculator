@@ -12,6 +12,17 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import ExportOptions from "./ExportOptions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ProductCost {
   id?: string;
@@ -256,18 +267,20 @@ export default function CostCalculator() {
               3D Printing Cost Calculator
             </h1>
             <div className="flex items-center space-x-4">
-              <button
+              <Button
                 onClick={() => setDarkMode(!darkMode)}
+                variant="ghost"
+                size="icon"
                 className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
               >
                 {darkMode ? "☀️" : "🌙"}
-              </button>
+              </Button>
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 {user?.email}
               </span>
-              <button onClick={logout} className="btn-secondary px-4 py-2">
+              <Button onClick={logout} variant="outline" size="sm">
                 Logout
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -278,435 +291,478 @@ export default function CostCalculator() {
           {/* Left Column - Input Forms */}
           <div className="lg:col-span-2 space-y-6">
             {/* Product Information */}
-            <div className="card">
-              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                Product Information
-              </h2>
-              <div>
-                <label className="label">Product Name</label>
-                <input
-                  type="text"
-                  className="input mt-1"
-                  placeholder="Enter product name"
-                  value={formData.productName}
-                  onChange={(e) =>
-                    handleInputChange("productName", e.target.value)
-                  }
-                />
-              </div>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Label htmlFor="productName">Product Name</Label>
+                  <Input
+                    id="productName"
+                    type="text"
+                    placeholder="Enter product name"
+                    value={formData.productName}
+                    onChange={(e) =>
+                      handleInputChange("productName", e.target.value)
+                    }
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Material Costs */}
-            <div className="card">
-              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                Material Costs
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="label">Filament/Resin Type</label>
-                  <select
-                    className="input mt-1"
-                    value={formData.filamentType}
-                    onChange={(e) =>
-                      handleInputChange("filamentType", e.target.value)
-                    }
-                  >
-                    {FILAMENT_TYPES.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
+            <Card>
+              <CardHeader>
+                <CardTitle>Material Costs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="filamentType">Filament/Resin Type</Label>
+                    <Select
+                      value={formData.filamentType}
+                      onValueChange={(value) =>
+                        handleInputChange("filamentType", value)
+                      }
+                    >
+                      <SelectTrigger id="filamentType">
+                        <SelectValue placeholder="Select filament type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {FILAMENT_TYPES.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="materialCostPerKg">
+                      Material Cost per KG (₹)
+                    </Label>
+                    <Input
+                      id="materialCostPerKg"
+                      type="number"
+                      value={formData.materialCostPerKg}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "materialCostPerKg",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="materialWeightUsed">
+                      Material Weight Used (grams)
+                    </Label>
+                    <Input
+                      id="materialWeightUsed"
+                      type="number"
+                      value={formData.materialWeightUsed}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "materialWeightUsed",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="supportMaterialWeight">
+                      Support Material Weight (grams)
+                    </Label>
+                    <Input
+                      id="supportMaterialWeight"
+                      type="number"
+                      value={formData.supportMaterialWeight}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "supportMaterialWeight",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="packagingCost">Packaging Cost (₹)</Label>
+                    <Input
+                      id="packagingCost"
+                      type="number"
+                      value={formData.packagingCost}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "packagingCost",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="label">Material Cost per KG (₹)</label>
-                  <input
-                    type="number"
-                    className="input mt-1"
-                    value={formData.materialCostPerKg}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "materialCostPerKg",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="label">Material Weight Used (grams)</label>
-                  <input
-                    type="number"
-                    className="input mt-1"
-                    value={formData.materialWeightUsed}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "materialWeightUsed",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="label">
-                    Support Material Weight (grams)
-                  </label>
-                  <input
-                    type="number"
-                    className="input mt-1"
-                    value={formData.supportMaterialWeight}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "supportMaterialWeight",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="label">Packaging Cost (₹)</label>
-                  <input
-                    type="number"
-                    className="input mt-1"
-                    value={formData.packagingCost}
-                    onChange={(e) =>
-                      handleInputChange("packagingCost", Number(e.target.value))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Time & Machine Costs */}
-            <div className="card">
-              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                Time & Machine Costs
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="label">Print Time (Hours)</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    className="input mt-1"
-                    value={formData.printTimeHours}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "printTimeHours",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
+            <Card>
+              <CardHeader>
+                <CardTitle>Time & Machine Costs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="printTimeHours">Print Time (Hours)</Label>
+                    <Input
+                      id="printTimeHours"
+                      type="number"
+                      step="0.1"
+                      value={formData.printTimeHours}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "printTimeHours",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="printTimeMinutes">
+                      Print Time (Minutes)
+                    </Label>
+                    <Input
+                      id="printTimeMinutes"
+                      type="number"
+                      value={formData.printTimeMinutes}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "printTimeMinutes",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="machineHourlyRate">
+                      Machine Hourly Rate (₹/hour)
+                    </Label>
+                    <Input
+                      id="machineHourlyRate"
+                      type="number"
+                      value={formData.machineHourlyRate}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "machineHourlyRate",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="electricityCostPerHour">
+                      Electricity Cost per Hour (₹/hour)
+                    </Label>
+                    <Input
+                      id="electricityCostPerHour"
+                      type="number"
+                      value={formData.electricityCostPerHour}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "electricityCostPerHour",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="setupTimeMinutes">
+                      Setup/Preparation Time (minutes)
+                    </Label>
+                    <Input
+                      id="setupTimeMinutes"
+                      type="number"
+                      value={formData.setupTimeMinutes}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "setupTimeMinutes",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="label">Print Time (Minutes)</label>
-                  <input
-                    type="number"
-                    className="input mt-1"
-                    value={formData.printTimeMinutes}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "printTimeMinutes",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="label">Machine Hourly Rate (₹/hour)</label>
-                  <input
-                    type="number"
-                    className="input mt-1"
-                    value={formData.machineHourlyRate}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "machineHourlyRate",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="label">
-                    Electricity Cost per Hour (₹/hour)
-                  </label>
-                  <input
-                    type="number"
-                    className="input mt-1"
-                    value={formData.electricityCostPerHour}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "electricityCostPerHour",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="label">
-                    Setup/Preparation Time (minutes)
-                  </label>
-                  <input
-                    type="number"
-                    className="input mt-1"
-                    value={formData.setupTimeMinutes}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "setupTimeMinutes",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Labor Costs */}
-            <div className="card">
-              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                Labor Costs
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="label">Design Time (hours)</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    className="input mt-1"
-                    value={formData.designTimeHours}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "designTimeHours",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
+            <Card>
+              <CardHeader>
+                <CardTitle>Labor Costs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="designTimeHours">Design Time (hours)</Label>
+                    <Input
+                      id="designTimeHours"
+                      type="number"
+                      step="0.1"
+                      value={formData.designTimeHours}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "designTimeHours",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="postProcessingTimeMinutes">
+                      Post-Processing Time (minutes)
+                    </Label>
+                    <Input
+                      id="postProcessingTimeMinutes"
+                      type="number"
+                      value={formData.postProcessingTimeMinutes}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "postProcessingTimeMinutes",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="hourlyLaborRate">
+                      Hourly Labor Rate (₹/hour)
+                    </Label>
+                    <Input
+                      id="hourlyLaborRate"
+                      type="number"
+                      value={formData.hourlyLaborRate}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "hourlyLaborRate",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="label">
-                    Post-Processing Time (minutes)
-                  </label>
-                  <input
-                    type="number"
-                    className="input mt-1"
-                    value={formData.postProcessingTimeMinutes}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "postProcessingTimeMinutes",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="label">Hourly Labor Rate (₹/hour)</label>
-                  <input
-                    type="number"
-                    className="input mt-1"
-                    value={formData.hourlyLaborRate}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "hourlyLaborRate",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Business Costs */}
-            <div className="card">
-              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                Business Costs
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="label">Overhead Percentage (%)</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    className="input mt-1"
-                    value={formData.overheadPercentage}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "overheadPercentage",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
+            <Card>
+              <CardHeader>
+                <CardTitle>Business Costs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="overheadPercentage">
+                      Overhead Percentage (%)
+                    </Label>
+                    <Input
+                      id="overheadPercentage"
+                      type="number"
+                      step="0.1"
+                      value={formData.overheadPercentage}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "overheadPercentage",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="failureWasteRate">
+                      Failure/Waste Rate (%)
+                    </Label>
+                    <Input
+                      id="failureWasteRate"
+                      type="number"
+                      step="0.1"
+                      value={formData.failureWasteRate}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "failureWasteRate",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="desiredProfitMargin">
+                      Desired Profit Margin (%)
+                    </Label>
+                    <Input
+                      id="desiredProfitMargin"
+                      type="number"
+                      step="0.1"
+                      value={formData.desiredProfitMargin}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "desiredProfitMargin",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="label">Failure/Waste Rate (%)</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    className="input mt-1"
-                    value={formData.failureWasteRate}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "failureWasteRate",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="label">Desired Profit Margin (%)</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    className="input mt-1"
-                    value={formData.desiredProfitMargin}
-                    onChange={(e) =>
-                      handleInputChange(
-                        "desiredProfitMargin",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-4">
-              <button
+              <Button
                 onClick={saveCalculation}
                 disabled={loading}
-                className="btn-success px-6 py-2"
+                className="px-6 py-2"
               >
                 {loading ? "Saving..." : "Save Calculation"}
-              </button>
-              <button onClick={resetForm} className="btn-secondary px-6 py-2">
+              </Button>
+              <Button
+                onClick={resetForm}
+                variant="outline"
+                className="px-6 py-2"
+              >
                 Reset Form
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* Right Column - Results and History */}
           <div className="space-y-6">
             {/* Cost Breakdown */}
-            <div className="card">
-              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                Cost Breakdown
-              </h2>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Material Cost:
-                  </span>
-                  <span className="font-medium">
-                    {formatCurrency(calculations.materialCost)}
-                  </span>
+            <Card>
+              <CardHeader>
+                <CardTitle>Cost Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Material Cost:
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(calculations.materialCost)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Machine Cost:
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(calculations.machineCost)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Labor Cost:
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(calculations.laborCost)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Overhead:
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(calculations.overheadCost)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Waste Allowance:
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(calculations.wasteAllowance)}
+                    </span>
+                  </div>
+                  <hr className="border-gray-200 dark:border-gray-600" />
+                  <div className="flex justify-between text-lg font-semibold">
+                    <span className="text-blue-600 dark:text-blue-400">
+                      Total Cost:
+                    </span>
+                    <span className="text-blue-600 dark:text-blue-400">
+                      {formatCurrency(calculations.totalCost)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-lg font-semibold">
+                    <span className="text-green-600 dark:text-green-400">
+                      Selling Price:
+                    </span>
+                    <span className="text-green-600 dark:text-green-400">
+                      {formatCurrency(calculations.sellingPrice)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-lg font-semibold">
+                    <span className="text-green-600 dark:text-green-400">
+                      Profit:
+                    </span>
+                    <span className="text-green-600 dark:text-green-400">
+                      {formatCurrency(calculations.profitAmount)}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Machine Cost:
-                  </span>
-                  <span className="font-medium">
-                    {formatCurrency(calculations.machineCost)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Labor Cost:
-                  </span>
-                  <span className="font-medium">
-                    {formatCurrency(calculations.laborCost)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Overhead:
-                  </span>
-                  <span className="font-medium">
-                    {formatCurrency(calculations.overheadCost)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">
-                    Waste Allowance:
-                  </span>
-                  <span className="font-medium">
-                    {formatCurrency(calculations.wasteAllowance)}
-                  </span>
-                </div>
-                <hr className="border-gray-200 dark:border-gray-600" />
-                <div className="flex justify-between text-lg font-semibold">
-                  <span className="text-blue-600 dark:text-blue-400">
-                    Total Cost:
-                  </span>
-                  <span className="text-blue-600 dark:text-blue-400">
-                    {formatCurrency(calculations.totalCost)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-lg font-semibold">
-                  <span className="text-green-600 dark:text-green-400">
-                    Selling Price:
-                  </span>
-                  <span className="text-green-600 dark:text-green-400">
-                    {formatCurrency(calculations.sellingPrice)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-lg font-semibold">
-                  <span className="text-green-600 dark:text-green-400">
-                    Profit:
-                  </span>
-                  <span className="text-green-600 dark:text-green-400">
-                    {formatCurrency(calculations.profitAmount)}
-                  </span>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Export Options */}
             {formData.productName && (
-              <div className="card">
-                <ExportOptions
-                  productName={formData.productName}
-                  calculations={calculations}
-                  formData={formData}
-                />
-              </div>
+              <Card>
+                <CardContent>
+                  <ExportOptions
+                    productName={formData.productName}
+                    calculations={calculations}
+                    formData={formData}
+                  />
+                </CardContent>
+              </Card>
             )}
 
             {/* History */}
-            <div className="card">
-              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                Calculation History
-              </h2>
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {history.length === 0 ? (
-                  <p className="text-gray-500 dark:text-gray-400 text-sm">
-                    No calculations saved yet.
-                  </p>
-                ) : (
-                  history.map((item) => (
-                    <div
-                      key={item.id}
-                      className="p-3 border border-gray-200 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-                      onClick={() => loadFromHistory(item)}
-                    >
-                      <div className="font-medium text-sm truncate">
-                        {item.productName}
+            <Card>
+              <CardHeader>
+                <CardTitle>Calculation History</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {history.length === 0 ? (
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">
+                      No calculations saved yet.
+                    </p>
+                  ) : (
+                    history.map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-3 border border-gray-200 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                        onClick={() => loadFromHistory(item)}
+                      >
+                        <div className="font-medium text-sm truncate">
+                          {item.productName}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Cost: {formatCurrency(item.totalCost || 0)} • Price:{" "}
+                          {formatCurrency(item.sellingPrice || 0)}
+                        </div>
+                        <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                          {item.createdAt
+                            ? (item.createdAt instanceof Timestamp
+                                ? item.createdAt.toDate()
+                                : item.createdAt
+                              ).toLocaleDateString()
+                            : "Unknown date"}
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        Cost: {formatCurrency(item.totalCost || 0)} • Price:{" "}
-                        {formatCurrency(item.sellingPrice || 0)}
-                      </div>
-                      <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                        {item.createdAt
-                          ? (item.createdAt instanceof Timestamp
-                              ? item.createdAt.toDate()
-                              : item.createdAt
-                            ).toLocaleDateString()
-                          : "Unknown date"}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

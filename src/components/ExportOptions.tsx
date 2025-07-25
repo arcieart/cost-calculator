@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Button } from "@/components/ui/button";
 
 interface ExportOptionsProps {
   productName: string;
@@ -251,18 +252,22 @@ export default function ExportOptions({
         Export Options
       </h3>
       <div className="space-y-2">
-        <button
+        <Button
           onClick={handlePrint}
-          className="btn-secondary w-full px-4 py-2 text-sm"
+          variant="outline"
+          className="w-full"
+          size="sm"
         >
           🖨️ Print Report
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleExportJSON}
-          className="btn-secondary w-full px-4 py-2 text-sm"
+          variant="outline"
+          className="w-full"
+          size="sm"
         >
           📁 Export as JSON
-        </button>
+        </Button>
       </div>
     </div>
   );
