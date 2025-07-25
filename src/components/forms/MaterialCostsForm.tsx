@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { FormInput } from "@/components/ui/form-input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -70,12 +70,12 @@ export function MaterialCostsForm({
               <span>Material Cost per KG (₹)</span>
             </Label>
             <div className="relative">
-              <Input
+              <FormInput
                 id="materialCostPerKg"
                 type="number"
                 value={materialCostPerKg}
                 onChange={(e) => onMaterialCostChange(Number(e.target.value))}
-                className="pl-8 h-11"
+                variant="lg"
                 placeholder="0.00"
               />
             </div>
@@ -89,12 +89,12 @@ export function MaterialCostsForm({
               <span>Material Weight Used (grams)</span>
             </Label>
             <div className="relative">
-              <Input
+              <FormInput
                 id="materialWeightUsed"
                 type="number"
                 value={materialWeightUsed}
                 onChange={(e) => onMaterialWeightChange(Number(e.target.value))}
-                className="pl-8 h-11"
+                variant="lg"
                 placeholder="0"
               />
             </div>
@@ -108,12 +108,12 @@ export function MaterialCostsForm({
               <span>Packaging Cost (₹)</span>
             </Label>
             <div className="relative">
-              <Input
+              <FormInput
                 id="packagingCost"
                 type="number"
                 value={packagingCost}
                 onChange={(e) => onPackagingCostChange(Number(e.target.value))}
-                className="pl-8 h-11"
+                variant="lg"
                 placeholder="0.00"
               />
             </div>

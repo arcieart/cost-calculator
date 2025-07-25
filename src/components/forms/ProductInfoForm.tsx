@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { FormInput } from "@/components/ui/form-input";
 import { Label } from "@/components/ui/label";
 
 interface ProductInfoFormProps {
@@ -28,13 +28,14 @@ export function ProductInfoForm({
             <span>Product Name</span>
           </Label>
           <div className="relative">
-            <Input
+            <FormInput
               id="productName"
               type="text"
               placeholder="Enter product name (e.g., Custom Phone Case, Miniature Figure)"
               value={productName}
               onChange={(e) => onProductNameChange(e.target.value)}
-              className="pl-10 h-12 text-base"
+              variant="lg"
+              className="text-base"
             />
           </div>
           <p className="text-xs text-muted-foreground">

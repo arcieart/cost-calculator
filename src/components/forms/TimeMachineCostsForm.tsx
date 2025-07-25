@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { FormInput } from "@/components/ui/form-input";
 import { Label } from "@/components/ui/label";
 
 interface TimeMachineCostsFormProps {
@@ -41,12 +41,12 @@ export function TimeMachineCostsForm({
               <span>Print Time (minutes)</span>
             </Label>
             <div className="relative">
-              <Input
+              <FormInput
                 id="printTimeMinutes"
                 type="number"
                 value={printTimeMinutes}
                 onChange={(e) => onPrintTimeChange(Number(e.target.value))}
-                className="pl-8 h-11"
+                variant="lg"
                 placeholder="0"
               />
             </div>
@@ -60,12 +60,12 @@ export function TimeMachineCostsForm({
               <span>Setup Time (minutes)</span>
             </Label>
             <div className="relative">
-              <Input
+              <FormInput
                 id="setupTimeMinutes"
                 type="number"
                 value={setupTimeMinutes}
                 onChange={(e) => onSetupTimeChange(Number(e.target.value))}
-                className="pl-8 h-11"
+                variant="lg"
                 placeholder="0"
               />
             </div>
@@ -79,12 +79,12 @@ export function TimeMachineCostsForm({
               <span>Machine Hourly Rate (₹)</span>
             </Label>
             <div className="relative">
-              <Input
+              <FormInput
                 id="machineHourlyRate"
                 type="number"
                 value={machineHourlyRate}
                 onChange={(e) => onMachineRateChange(Number(e.target.value))}
-                className="pl-8 h-11"
+                variant="lg"
                 placeholder="0.00"
               />
             </div>
@@ -98,14 +98,14 @@ export function TimeMachineCostsForm({
               <span>Electricity Cost per Hour (₹)</span>
             </Label>
             <div className="relative">
-              <Input
+              <FormInput
                 id="electricityCostPerHour"
                 type="number"
                 value={electricityCostPerHour}
                 onChange={(e) =>
                   onElectricityCostChange(Number(e.target.value))
                 }
-                className="pl-8 h-11"
+                variant="lg"
                 placeholder="0.00"
               />
             </div>
