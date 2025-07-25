@@ -9,8 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FILAMENT_TYPES, FilamentType } from "../../types/product";
-import { Package, DollarSign, Weight, Box } from "lucide-react";
+import { FILAMENT_TYPES } from "../../types/product";
 
 interface MaterialCostsFormProps {
   filamentType: string;
@@ -35,9 +34,8 @@ export function MaterialCostsForm({
 }: MaterialCostsFormProps) {
   return (
     <Card className="border-0 shadow-md bg-gradient-to-br from-card to-card/80">
-      <CardHeader className="pb-4">
+      <CardHeader className="">
         <CardTitle className="flex items-center space-x-2 text-lg">
-          <Package className="h-5 w-5 text-primary" />
           <span>Material Costs</span>
         </CardTitle>
       </CardHeader>
@@ -48,7 +46,6 @@ export function MaterialCostsForm({
               htmlFor="filamentType"
               className="text-sm font-medium flex items-center space-x-2"
             >
-              <Package className="h-4 w-4 text-muted-foreground" />
               <span>Filament Type</span>
             </Label>
             <Select value={filamentType} onValueChange={onFilamentTypeChange}>
@@ -70,7 +67,6 @@ export function MaterialCostsForm({
               htmlFor="materialCostPerKg"
               className="text-sm font-medium flex items-center space-x-2"
             >
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
               <span>Material Cost per KG (₹)</span>
             </Label>
             <div className="relative">
@@ -82,7 +78,6 @@ export function MaterialCostsForm({
                 className="pl-8 h-11"
                 placeholder="0.00"
               />
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             </div>
           </div>
 
@@ -91,7 +86,6 @@ export function MaterialCostsForm({
               htmlFor="materialWeightUsed"
               className="text-sm font-medium flex items-center space-x-2"
             >
-              <Weight className="h-4 w-4 text-muted-foreground" />
               <span>Material Weight Used (grams)</span>
             </Label>
             <div className="relative">
@@ -103,7 +97,6 @@ export function MaterialCostsForm({
                 className="pl-8 h-11"
                 placeholder="0"
               />
-              <Weight className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             </div>
           </div>
 
@@ -112,7 +105,6 @@ export function MaterialCostsForm({
               htmlFor="packagingCost"
               className="text-sm font-medium flex items-center space-x-2"
             >
-              <Box className="h-4 w-4 text-muted-foreground" />
               <span>Packaging Cost (₹)</span>
             </Label>
             <div className="relative">
@@ -124,7 +116,6 @@ export function MaterialCostsForm({
                 className="pl-8 h-11"
                 placeholder="0.00"
               />
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             </div>
           </div>
         </div>

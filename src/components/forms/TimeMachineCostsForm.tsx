@@ -2,7 +2,6 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Clock, Cpu, Zap, Settings, DollarSign } from "lucide-react";
 
 interface TimeMachineCostsFormProps {
   printTimeMinutes: number;
@@ -27,9 +26,8 @@ export function TimeMachineCostsForm({
 }: TimeMachineCostsFormProps) {
   return (
     <Card className="border-0 shadow-md bg-gradient-to-br from-card to-card/80">
-      <CardHeader className="pb-4">
+      <CardHeader className="">
         <CardTitle className="flex items-center space-x-2 text-lg">
-          <Cpu className="h-5 w-5 text-primary" />
           <span>Time & Machine Costs</span>
         </CardTitle>
       </CardHeader>
@@ -40,7 +38,6 @@ export function TimeMachineCostsForm({
               htmlFor="printTimeMinutes"
               className="text-sm font-medium flex items-center space-x-2"
             >
-              <Clock className="h-4 w-4 text-muted-foreground" />
               <span>Print Time (minutes)</span>
             </Label>
             <div className="relative">
@@ -52,7 +49,6 @@ export function TimeMachineCostsForm({
                 className="pl-8 h-11"
                 placeholder="0"
               />
-              <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             </div>
           </div>
 
@@ -61,7 +57,6 @@ export function TimeMachineCostsForm({
               htmlFor="setupTimeMinutes"
               className="text-sm font-medium flex items-center space-x-2"
             >
-              <Settings className="h-4 w-4 text-muted-foreground" />
               <span>Setup Time (minutes)</span>
             </Label>
             <div className="relative">
@@ -73,7 +68,6 @@ export function TimeMachineCostsForm({
                 className="pl-8 h-11"
                 placeholder="0"
               />
-              <Settings className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             </div>
           </div>
 
@@ -82,7 +76,6 @@ export function TimeMachineCostsForm({
               htmlFor="machineHourlyRate"
               className="text-sm font-medium flex items-center space-x-2"
             >
-              <Cpu className="h-4 w-4 text-muted-foreground" />
               <span>Machine Hourly Rate (₹)</span>
             </Label>
             <div className="relative">
@@ -94,7 +87,6 @@ export function TimeMachineCostsForm({
                 className="pl-8 h-11"
                 placeholder="0.00"
               />
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             </div>
           </div>
 
@@ -103,7 +95,6 @@ export function TimeMachineCostsForm({
               htmlFor="electricityCostPerHour"
               className="text-sm font-medium flex items-center space-x-2"
             >
-              <Zap className="h-4 w-4 text-muted-foreground" />
               <span>Electricity Cost per Hour (₹)</span>
             </Label>
             <div className="relative">
@@ -117,7 +108,6 @@ export function TimeMachineCostsForm({
                 className="pl-8 h-11"
                 placeholder="0.00"
               />
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             </div>
           </div>
         </div>

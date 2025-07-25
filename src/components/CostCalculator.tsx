@@ -59,6 +59,7 @@ export default function CostCalculator() {
     history,
     loading: historyLoading,
     saveCalculation: saveToHistory,
+    deleteCalculation: deleteFromHistory,
   } = useCalculationHistory();
 
   const handleSaveCalculation = async () => {
@@ -233,19 +234,6 @@ export default function CostCalculator() {
                 isWholesale={formData.isWholesale || false}
                 quantity={formData.quantity || 1}
               />
-
-              {/* Export Options */}
-              {formData.productName && (
-                <Card className="border-dashed border-primary/20 bg-primary/5">
-                  <CardContent className="pt-4">
-                    <ExportOptions
-                      productName={formData.productName}
-                      calculations={calculations}
-                      formData={formData}
-                    />
-                  </CardContent>
-                </Card>
-              )}
             </div>
 
             {/* History Section */}
@@ -257,6 +245,8 @@ export default function CostCalculator() {
               <CalculationHistory
                 history={history}
                 onLoadFromHistory={loadFromHistory}
+                onDeleteItem={deleteFromHistory}
+                loading={historyLoading}
               />
             </div>
           </div>

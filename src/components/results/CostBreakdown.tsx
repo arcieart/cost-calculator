@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { CalculationResults } from "../../types/product";
 import { formatCurrency } from "../../lib/formatters";
 import { getVolumeDiscount, WHOLESALE_CONFIG } from "../../config/wholesale";
-import { Calculator, DollarSign, TrendingUp } from "lucide-react";
+import { Calculator, IndianRupee, TrendingUp } from "lucide-react";
 
 interface CostBreakdownProps {
   calculations: CalculationResults;
@@ -77,7 +77,7 @@ export function CostBreakdown({
           {/* Total Cost */}
           <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
             <div className="flex items-center space-x-2">
-              <DollarSign className="h-4 w-4 text-primary" />
+              <IndianRupee className="h-4 w-4 text-primary" />
               <span className="font-medium">
                 {isWholesale ? "Cost per Unit" : "Total Cost"}
               </span>

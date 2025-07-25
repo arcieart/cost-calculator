@@ -4,6 +4,7 @@ import {
   setDoc,
   doc,
   getDocs,
+  deleteDoc,
   query,
   where,
   orderBy,
@@ -102,5 +103,20 @@ export async function loadCalculationHistory(): Promise<ProductCost[]> {
   } catch (error) {
     console.error("Error loading history:", error);
     throw new Error("Failed to load calculation history");
+  }
+}
+
+export async function deleteCalculation(id: string): Promise<void> {
+  try {
+    // Check if user is authenticated
+    if (!auth.currentUser) {
+      throw new Error("User must be authenticated to delete calculations");
+    }
+
+    const docRef = doc(db, COLLECTION_NAME, id);
+    await deleteDoc(docRef);
+  } catch (error) {
+    console.error("Error deleting calculation:", error);
+    throw new Error("Failed to delete calculation");
   }
 } 

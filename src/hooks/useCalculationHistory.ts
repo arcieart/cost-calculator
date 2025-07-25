@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { ProductCost, CalculationResults } from "../types/product";
-import { saveCalculation, loadCalculationHistory, SaveCalculationParams } from "../services/firestore";
+import { saveCalculation, loadCalculationHistory, deleteCalculation, SaveCalculationParams } from "../services/firestore";
 import { useAuth } from "../contexts/AuthContext";
 import { validateProductForm } from "../lib/validators";
 
@@ -57,6 +57,24 @@ export function useCalculationHistory() {
     }
   }, [user, loadHistory]);
 
+  const deleteCalculationItem = useCallback(async (id: string) => {
+    if (!user) {
+      throw new Error("User must be authenticated to delete calculations");
+    }
+
+    setLoading(true);
+    try {
+      await deleteCalculation(id);
+      await loadHistory();
+      return true;
+    } catch (error) {
+      console.error("Error deleting calculation:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, [user, loadHistory]);
+
   // Load history when user changes
   useEffect(() => {
     if (user) {
@@ -70,6 +88,7 @@ export function useCalculationHistory() {
     history,
     loading,
     saveCalculation: saveNewCalculation,
+    deleteCalculation: deleteCalculationItem,
     refreshHistory: loadHistory,
   };
 } 
