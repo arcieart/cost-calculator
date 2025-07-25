@@ -23,6 +23,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { ChevronDown } from "lucide-react";
+import { AccessoriesState, AccessoryType } from "../types/accessories";
+import {
+  DEFAULT_ACCESSORIES,
+  ACCESSORY_CONFIGS,
+  ACCESSORY_TYPES,
+} from "../config/accessories";
 
 interface ProductCost {
   id?: string;
@@ -31,18 +47,18 @@ interface ProductCost {
   filamentType: string;
   materialCostPerKg: number;
   materialWeightUsed: number;
-  supportMaterialWeight: number;
   packagingCost: number;
   // Time & machine costs
-  printTimeHours: number;
   printTimeMinutes: number;
   machineHourlyRate: number;
   electricityCostPerHour: number;
   setupTimeMinutes: number;
   // Labor costs
-  designTimeHours: number;
+  designTimeMinutes: number;
   postProcessingTimeMinutes: number;
   hourlyLaborRate: number;
+  // Accessories
+  accessories: AccessoriesState;
   // Business costs
   overheadPercentage: number;
   failureWasteRate: number;
@@ -55,33 +71,34 @@ interface ProductCost {
 }
 
 const FILAMENT_TYPES = ["PLA", "ABS", "PETG", "TPU"];
+const DEFAULT_FORM_DATA: ProductCost = {
+  productName: "",
+  filamentType: "PLA",
+  materialCostPerKg: 2000,
+  materialWeightUsed: 50,
+  packagingCost: 50,
+  printTimeMinutes: 150,
+  machineHourlyRate: 100,
+  electricityCostPerHour: 10,
+  setupTimeMinutes: 15,
+  designTimeMinutes: 0,
+  postProcessingTimeMinutes: 30,
+  hourlyLaborRate: 300,
+  accessories: { ...DEFAULT_ACCESSORIES },
+  overheadPercentage: 15,
+  failureWasteRate: 8,
+  desiredProfitMargin: 40,
+};
 
 export default function CostCalculator() {
   const { user, logout } = useAuth();
-  const [formData, setFormData] = useState<ProductCost>({
-    productName: "",
-    filamentType: "PLA",
-    materialCostPerKg: 2000,
-    materialWeightUsed: 50,
-    supportMaterialWeight: 0,
-    packagingCost: 50,
-    printTimeHours: 2,
-    printTimeMinutes: 30,
-    machineHourlyRate: 100,
-    electricityCostPerHour: 25,
-    setupTimeMinutes: 15,
-    designTimeHours: 0,
-    postProcessingTimeMinutes: 30,
-    hourlyLaborRate: 300,
-    overheadPercentage: 15,
-    failureWasteRate: 8,
-    desiredProfitMargin: 40,
-  });
+  const [formData, setFormData] = useState<ProductCost>(DEFAULT_FORM_DATA);
 
   const [calculations, setCalculations] = useState({
     materialCost: 0,
     machineCost: 0,
     laborCost: 0,
+    accessoriesCost: 0,
     baseCost: 0,
     overheadCost: 0,
     wasteAllowance: 0,
@@ -135,22 +152,32 @@ export default function CostCalculator() {
   const calculateCosts = () => {
     // Material cost calculation
     const materialCost =
-      ((formData.materialWeightUsed + formData.supportMaterialWeight) / 1000) *
-      formData.materialCostPerKg;
+      (formData.materialWeightUsed / 1000) * formData.materialCostPerKg;
 
     // Machine cost calculation
-    const totalPrintTimeHours =
-      formData.printTimeHours + formData.printTimeMinutes / 60;
+    const totalPrintTimeHours = formData.printTimeMinutes / 60;
     const machineCost = totalPrintTimeHours * formData.machineHourlyRate;
     const electricityCost =
       totalPrintTimeHours * formData.electricityCostPerHour;
 
     // Labor cost calculation
     const setupTimeHours = formData.setupTimeMinutes / 60;
+    const designTimeHours = formData.designTimeMinutes / 60;
     const postProcessingTimeHours = formData.postProcessingTimeMinutes / 60;
     const totalLaborTimeHours =
-      formData.designTimeHours + setupTimeHours + postProcessingTimeHours;
+      designTimeHours + setupTimeHours + postProcessingTimeHours;
     const laborCost = totalLaborTimeHours * formData.hourlyLaborRate;
+
+    // Accessories cost calculation
+    const accessoriesCost = Object.values(formData.accessories).reduce(
+      (total, accessory) => {
+        if (accessory.enabled) {
+          return total + accessory.quantity * accessory.unitCost;
+        }
+        return total;
+      },
+      0
+    );
 
     // Base cost
     const baseCost =
@@ -158,6 +185,7 @@ export default function CostCalculator() {
       machineCost +
       electricityCost +
       laborCost +
+      accessoriesCost +
       formData.packagingCost;
 
     // Overhead and waste
@@ -175,6 +203,7 @@ export default function CostCalculator() {
       materialCost,
       machineCost: machineCost + electricityCost,
       laborCost,
+      accessoriesCost,
       baseCost,
       overheadCost,
       wasteAllowance,
@@ -192,6 +221,31 @@ export default function CostCalculator() {
       ...prev,
       [field]: value,
     }));
+  };
+
+  const handleAccessoryChange = (
+    accessoryType: AccessoryType,
+    field: "enabled" | "quantity" | "unitCost",
+    value: boolean | number
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      accessories: {
+        ...prev.accessories,
+        [accessoryType]: {
+          ...prev.accessories[accessoryType],
+          [field]: value,
+        },
+      },
+    }));
+  };
+
+  const getSelectedAccessories = () => {
+    return ACCESSORY_TYPES.filter((type) => formData.accessories[type].enabled);
+  };
+
+  const getSelectedAccessoriesCount = () => {
+    return getSelectedAccessories().length;
   };
 
   const saveCalculation = async () => {
@@ -225,28 +279,14 @@ export default function CostCalculator() {
     setFormData({
       ...item,
       productName: `${item.productName} (Copy)`,
+      accessories: item.accessories || { ...DEFAULT_ACCESSORIES },
     });
   };
 
   const resetForm = () => {
     setFormData({
-      productName: "",
-      filamentType: "PLA",
-      materialCostPerKg: 2000,
-      materialWeightUsed: 50,
-      supportMaterialWeight: 0,
-      packagingCost: 50,
-      printTimeHours: 2,
-      printTimeMinutes: 30,
-      machineHourlyRate: 100,
-      electricityCostPerHour: 25,
-      setupTimeMinutes: 15,
-      designTimeHours: 0,
-      postProcessingTimeMinutes: 30,
-      hourlyLaborRate: 300,
-      overheadPercentage: 15,
-      failureWasteRate: 8,
-      desiredProfitMargin: 40,
+      ...DEFAULT_FORM_DATA,
+      accessories: { ...DEFAULT_ACCESSORIES },
     });
   };
 
@@ -319,7 +359,7 @@ export default function CostCalculator() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="filamentType">Filament/Resin Type</Label>
+                    <Label htmlFor="filamentType">Filament Type</Label>
                     <Select
                       value={formData.filamentType}
                       onValueChange={(value) =>
@@ -371,22 +411,6 @@ export default function CostCalculator() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="supportMaterialWeight">
-                      Support Material Weight (grams)
-                    </Label>
-                    <Input
-                      id="supportMaterialWeight"
-                      type="number"
-                      value={formData.supportMaterialWeight}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "supportMaterialWeight",
-                          Number(e.target.value)
-                        )
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
                     <Label htmlFor="packagingCost">Packaging Cost (₹)</Label>
                     <Input
                       id="packagingCost"
@@ -411,21 +435,6 @@ export default function CostCalculator() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="printTimeHours">Print Time (Hours)</Label>
-                    <Input
-                      id="printTimeHours"
-                      type="number"
-                      step="0.1"
-                      value={formData.printTimeHours}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "printTimeHours",
-                          Number(e.target.value)
-                        )
-                      }
-                    />
-                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="printTimeMinutes">
                       Print Time (Minutes)
@@ -502,15 +511,16 @@ export default function CostCalculator() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="designTimeHours">Design Time (hours)</Label>
+                    <Label htmlFor="designTimeMinutes">
+                      Design Time (minutes)
+                    </Label>
                     <Input
-                      id="designTimeHours"
+                      id="designTimeMinutes"
                       type="number"
-                      step="0.1"
-                      value={formData.designTimeHours}
+                      value={formData.designTimeMinutes}
                       onChange={(e) =>
                         handleInputChange(
-                          "designTimeHours",
+                          "designTimeMinutes",
                           Number(e.target.value)
                         )
                       }
@@ -548,6 +558,159 @@ export default function CostCalculator() {
                       }
                     />
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Accessories */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Accessories</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Accessories Dropdown Selector */}
+                  <div className="space-y-2">
+                    <Label>Select Accessories</Label>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-between"
+                        >
+                          {getSelectedAccessoriesCount() === 0 ? (
+                            "Select accessories..."
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <span>
+                                {getSelectedAccessoriesCount()} selected
+                              </span>
+                              <div className="flex gap-1">
+                                {getSelectedAccessories()
+                                  .slice(0, 2)
+                                  .map((type) => (
+                                    <Badge
+                                      key={type}
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
+                                      {ACCESSORY_CONFIGS[type].name}
+                                    </Badge>
+                                  ))}
+                                {getSelectedAccessoriesCount() > 2 && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
+                                    +{getSelectedAccessoriesCount() - 2}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          <ChevronDown className="h-4 w-4 opacity-50" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-56">
+                        <DropdownMenuLabel>
+                          Choose Accessories
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {ACCESSORY_TYPES.map((accessoryType) => {
+                          const accessory = formData.accessories[accessoryType];
+                          const config = ACCESSORY_CONFIGS[accessoryType];
+
+                          return (
+                            <DropdownMenuCheckboxItem
+                              key={accessoryType}
+                              checked={accessory.enabled}
+                              onCheckedChange={(checked) =>
+                                handleAccessoryChange(
+                                  accessoryType,
+                                  "enabled",
+                                  checked
+                                )
+                              }
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">
+                                  {config.name}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {config.description}
+                                </span>
+                              </div>
+                            </DropdownMenuCheckboxItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  {/* Configuration for Selected Accessories */}
+                  {getSelectedAccessories().length > 0 && (
+                    <div className="space-y-4">
+                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Configure Selected Accessories:
+                      </div>
+                      {getSelectedAccessories().map((accessoryType) => {
+                        const accessory = formData.accessories[accessoryType];
+                        const config = ACCESSORY_CONFIGS[accessoryType];
+
+                        return (
+                          <div
+                            key={accessoryType}
+                            className="border border-gray-200 dark:border-gray-600 rounded-md p-4"
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="font-medium">{config.name}</div>
+                              <Badge variant="outline" className="text-xs">
+                                ₹{accessory.unitCost * accessory.quantity}
+                              </Badge>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label htmlFor={`${accessoryType}-quantity`}>
+                                  Quantity
+                                </Label>
+                                <Input
+                                  id={`${accessoryType}-quantity`}
+                                  type="number"
+                                  min="1"
+                                  value={accessory.quantity}
+                                  onChange={(e) =>
+                                    handleAccessoryChange(
+                                      accessoryType,
+                                      "quantity",
+                                      Number(e.target.value)
+                                    )
+                                  }
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor={`${accessoryType}-cost`}>
+                                  Unit Cost (₹)
+                                </Label>
+                                <Input
+                                  id={`${accessoryType}-cost`}
+                                  type="number"
+                                  step="0.01"
+                                  value={accessory.unitCost}
+                                  onChange={(e) =>
+                                    handleAccessoryChange(
+                                      accessoryType,
+                                      "unitCost",
+                                      Number(e.target.value)
+                                    )
+                                  }
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -664,6 +827,14 @@ export default function CostCalculator() {
                     </span>
                     <span className="font-medium">
                       {formatCurrency(calculations.laborCost)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Accessories Cost:
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(calculations.accessoriesCost)}
                     </span>
                   </div>
                   <div className="flex justify-between">
