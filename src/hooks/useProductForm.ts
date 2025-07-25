@@ -24,23 +24,47 @@ export function useProductForm() {
     field: "enabled" | "quantity" | "unitCost",
     value: boolean | number
   ) => {
-    setFormData((prev) => ({
-      ...prev,
-      accessories: {
-        ...prev.accessories,
-        [accessoryType]: {
-          ...prev.accessories[accessoryType],
-          [field]: value,
+    setFormData((prev) => {
+      // Ensure the accessory has all default values before updating
+      const existingAccessory = prev.accessories[accessoryType];
+      const defaultAccessory = DEFAULT_ACCESSORIES[accessoryType];
+      const completeAccessory = {
+        ...defaultAccessory,
+        ...existingAccessory,
+      };
+
+      return {
+        ...prev,
+        accessories: {
+          ...prev.accessories,
+          [accessoryType]: {
+            ...completeAccessory,
+            [field]: value,
+          },
         },
-      },
-    }));
+      };
+    });
   }, []);
 
   const loadFromHistory = useCallback((item: ProductCost) => {
+    // Merge each accessory with its defaults to ensure completeness
+    const mergedAccessories = { ...DEFAULT_ACCESSORIES };
+    
+    if (item.accessories) {
+      Object.entries(item.accessories).forEach(([type, accessory]) => {
+        if (accessory && type in DEFAULT_ACCESSORIES) {
+          mergedAccessories[type as AccessoryType] = {
+            ...DEFAULT_ACCESSORIES[type as AccessoryType],
+            ...accessory,
+          };
+        }
+      });
+    }
+
     setFormData({
       ...item,
       productName: `${item.productName} (Copy)`,
-      accessories: item.accessories || { ...DEFAULT_ACCESSORIES },
+      accessories: mergedAccessories,
     });
   }, []);
 
