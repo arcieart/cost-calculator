@@ -39,6 +39,11 @@ import {
   ACCESSORY_CONFIGS,
   ACCESSORY_TYPES,
 } from "../config/accessories";
+import {
+  getVolumeDiscount,
+  getBatchEfficiencyFactor,
+  WHOLESALE_CONFIG,
+} from "../config/wholesale";
 
 interface ProductCost {
   id?: string;
@@ -63,6 +68,9 @@ interface ProductCost {
   overheadPercentage: number;
   failureWasteRate: number;
   desiredProfitMargin: number;
+  // Wholesale specific fields
+  quantity?: number;
+  isWholesale?: boolean;
   // Calculated values
   totalCost?: number;
   sellingPrice?: number;
@@ -74,20 +82,22 @@ const FILAMENT_TYPES = ["PLA", "ABS", "PETG", "TPU"];
 const DEFAULT_FORM_DATA: ProductCost = {
   productName: "",
   filamentType: "PLA",
-  materialCostPerKg: 2000,
-  materialWeightUsed: 50,
+  materialCostPerKg: 1000,
+  materialWeightUsed: 10,
   packagingCost: 50,
   printTimeMinutes: 150,
-  machineHourlyRate: 100,
+  machineHourlyRate: 50,
   electricityCostPerHour: 10,
-  setupTimeMinutes: 15,
-  designTimeMinutes: 0,
-  postProcessingTimeMinutes: 30,
-  hourlyLaborRate: 300,
+  setupTimeMinutes: 10,
+  designTimeMinutes: 5,
+  postProcessingTimeMinutes: 5,
+  hourlyLaborRate: 100,
   accessories: { ...DEFAULT_ACCESSORIES },
-  overheadPercentage: 15,
+  overheadPercentage: 5,
   failureWasteRate: 8,
   desiredProfitMargin: 40,
+  quantity: 1,
+  isWholesale: false,
 };
 
 export default function CostCalculator() {
@@ -138,11 +148,14 @@ export default function CostCalculator() {
         collection(db, "product-costs"),
         orderBy("createdAt", "desc")
       );
+
       const querySnapshot = await getDocs(q);
+
       const historyData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as ProductCost[];
+
       setHistory(historyData);
     } catch (error) {
       console.error("Error loading history:", error);
@@ -150,6 +163,9 @@ export default function CostCalculator() {
   };
 
   const calculateCosts = () => {
+    const quantity = formData.quantity || 1;
+    const isWholesale = formData.isWholesale;
+
     // Material cost calculation
     const materialCost =
       (formData.materialWeightUsed / 1000) * formData.materialCostPerKg;
@@ -160,10 +176,15 @@ export default function CostCalculator() {
     const electricityCost =
       totalPrintTimeHours * formData.electricityCostPerHour;
 
-    // Labor cost calculation
-    const setupTimeHours = formData.setupTimeMinutes / 60;
+    // Labor cost calculation with batch efficiency
+    const batchEfficiencyFactor = isWholesale
+      ? getBatchEfficiencyFactor(quantity)
+      : 1;
+    const setupTimeHours =
+      (formData.setupTimeMinutes / 60) * batchEfficiencyFactor;
     const designTimeHours = formData.designTimeMinutes / 60;
-    const postProcessingTimeHours = formData.postProcessingTimeMinutes / 60;
+    const postProcessingTimeHours =
+      (formData.postProcessingTimeMinutes / 60) * batchEfficiencyFactor;
     const totalLaborTimeHours =
       designTimeHours + setupTimeHours + postProcessingTimeHours;
     const laborCost = totalLaborTimeHours * formData.hourlyLaborRate;
@@ -179,6 +200,13 @@ export default function CostCalculator() {
       0
     );
 
+    // Packaging cost with bulk efficiency
+    const packagingCostPerUnit =
+      isWholesale && quantity >= WHOLESALE_CONFIG.BULK_PACKAGING_MIN_QUANTITY
+        ? formData.packagingCost *
+          (1 - WHOLESALE_CONFIG.BULK_PACKAGING_DISCOUNT) // Bulk packaging discount
+        : formData.packagingCost;
+
     // Base cost
     const baseCost =
       materialCost +
@@ -186,17 +214,27 @@ export default function CostCalculator() {
       electricityCost +
       laborCost +
       accessoriesCost +
-      formData.packagingCost;
+      packagingCostPerUnit;
 
     // Overhead and waste
     const overheadCost = baseCost * (formData.overheadPercentage / 100);
     const wasteAllowance = baseCost * (formData.failureWasteRate / 100);
 
-    // Total cost
+    // Total cost per unit
     const totalCost = baseCost + overheadCost + wasteAllowance;
 
-    // Selling price with profit margin
-    const sellingPrice = totalCost / (1 - formData.desiredProfitMargin / 100);
+    // Adjust profit margin for wholesale
+    let effectiveProfitMargin = formData.desiredProfitMargin;
+    if (isWholesale) {
+      const volumeDiscount = getVolumeDiscount(quantity);
+      effectiveProfitMargin = Math.max(
+        WHOLESALE_CONFIG.MINIMUM_PROFIT_MARGIN,
+        formData.desiredProfitMargin * (1 - volumeDiscount)
+      );
+    }
+
+    // Selling price with adjusted profit margin
+    const sellingPrice = totalCost / (1 - effectiveProfitMargin / 100);
     const profitAmount = sellingPrice - totalCost;
 
     setCalculations({
@@ -215,7 +253,7 @@ export default function CostCalculator() {
 
   const handleInputChange = (
     field: keyof ProductCost,
-    value: string | number
+    value: string | number | boolean
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -256,8 +294,17 @@ export default function CostCalculator() {
 
     setLoading(true);
     try {
+      // Filter accessories to only include selected ones
+      const selectedAccessories: AccessoriesState = {};
+      Object.entries(formData.accessories).forEach(([key, accessory]) => {
+        if (accessory.enabled) {
+          selectedAccessories[key as AccessoryType] = accessory;
+        }
+      });
+
       const productData = {
         ...formData,
+        accessories: selectedAccessories,
         totalCost: calculations.totalCost,
         sellingPrice: calculations.sellingPrice,
         profitAmount: calculations.profitAmount,
@@ -777,6 +824,53 @@ export default function CostCalculator() {
               </CardContent>
             </Card>
 
+            {/* Wholesale Options */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Wholesale Options</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      id="isWholesale"
+                      type="checkbox"
+                      checked={formData.isWholesale}
+                      onChange={(e) =>
+                        handleInputChange("isWholesale", e.target.checked)
+                      }
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <Label
+                      htmlFor="isWholesale"
+                      className="text-sm font-medium text-gray-900 dark:text-gray-100"
+                    >
+                      This is a wholesale order
+                    </Label>
+                  </div>
+                  {formData.isWholesale && (
+                    <div className="space-y-2">
+                      <Label htmlFor="quantity">Quantity</Label>
+                      <Input
+                        id="quantity"
+                        type="number"
+                        min="1"
+                        value={formData.quantity}
+                        onChange={(e) =>
+                          handleInputChange("quantity", Number(e.target.value))
+                        }
+                        placeholder="Enter order quantity"
+                      />
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Volume discounts apply for orders of{" "}
+                        {WHOLESALE_CONFIG.MIN_WHOLESALE_QUANTITY}+ units
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-4">
               <Button
@@ -801,7 +895,10 @@ export default function CostCalculator() {
             {/* Cost Breakdown */}
             <Card>
               <CardHeader>
-                <CardTitle>Cost Breakdown</CardTitle>
+                <CardTitle>
+                  Cost Breakdown{" "}
+                  {formData.isWholesale && `(${formData.quantity} units)`}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -856,7 +953,7 @@ export default function CostCalculator() {
                   <hr className="border-gray-200 dark:border-gray-600" />
                   <div className="flex justify-between text-lg font-semibold">
                     <span className="text-blue-600 dark:text-blue-400">
-                      Total Cost:
+                      {formData.isWholesale ? "Cost per Unit:" : "Total Cost:"}
                     </span>
                     <span className="text-blue-600 dark:text-blue-400">
                       {formatCurrency(calculations.totalCost)}
@@ -864,7 +961,9 @@ export default function CostCalculator() {
                   </div>
                   <div className="flex justify-between text-lg font-semibold">
                     <span className="text-green-600 dark:text-green-400">
-                      Selling Price:
+                      {formData.isWholesale
+                        ? "Wholesale Price per Unit:"
+                        : "Selling Price:"}
                     </span>
                     <span className="text-green-600 dark:text-green-400">
                       {formatCurrency(calculations.sellingPrice)}
@@ -872,12 +971,49 @@ export default function CostCalculator() {
                   </div>
                   <div className="flex justify-between text-lg font-semibold">
                     <span className="text-green-600 dark:text-green-400">
-                      Profit:
+                      {formData.isWholesale ? "Profit per Unit:" : "Profit:"}
                     </span>
                     <span className="text-green-600 dark:text-green-400">
                       {formatCurrency(calculations.profitAmount)}
                     </span>
                   </div>
+                  {formData.isWholesale && (
+                    <>
+                      <hr className="border-gray-200 dark:border-gray-600" />
+                      <div className="flex justify-between text-lg font-bold">
+                        <span className="text-purple-600 dark:text-purple-400">
+                          Total Order Value:
+                        </span>
+                        <span className="text-purple-600 dark:text-purple-400">
+                          {formatCurrency(
+                            calculations.sellingPrice * (formData.quantity || 1)
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-lg font-bold">
+                        <span className="text-purple-600 dark:text-purple-400">
+                          Total Profit:
+                        </span>
+                        <span className="text-purple-600 dark:text-purple-400">
+                          {formatCurrency(
+                            calculations.profitAmount * (formData.quantity || 1)
+                          )}
+                        </span>
+                      </div>
+                      {(formData.quantity || 1) >=
+                        WHOLESALE_CONFIG.MIN_WHOLESALE_QUANTITY && (
+                        <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900 rounded">
+                          <p className="text-sm text-blue-800 dark:text-blue-200">
+                            Volume Discount Applied:{" "}
+                            {Math.round(
+                              getVolumeDiscount(formData.quantity || 1) * 100
+                            )}
+                            %
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
