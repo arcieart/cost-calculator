@@ -219,7 +219,7 @@ export default function CostCalculator() {
           </div>
 
           {/* Right Column - Results and History */}
-          <div className="space-y-5">
+          <div className="space-y-5 sticky top-20 max-h-max overflow-y-auto">
             {/* Results Section */}
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
