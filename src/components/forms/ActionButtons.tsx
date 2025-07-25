@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Save, RotateCcw, Loader2 } from "lucide-react";
 
 interface ActionButtonsProps {
   onSave: () => void;
@@ -13,12 +14,24 @@ export function ActionButtons({
   isLoading,
 }: ActionButtonsProps) {
   return (
-    <div className="flex flex-wrap gap-4">
-      <Button onClick={onSave} disabled={isLoading} className="px-6 py-2">
-        {isLoading ? "Saving..." : "Save Calculation"}
+    <div className="flex gap-3">
+      <Button onClick={onSave} disabled={isLoading} className="flex-1">
+        {isLoading ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            Saving...
+          </>
+        ) : (
+          <>
+            <Save className="h-4 w-4 mr-2" />
+            Save
+          </>
+        )}
       </Button>
-      <Button onClick={onReset} variant="outline" className="px-6 py-2">
-        Reset Form
+
+      <Button onClick={onReset} variant="outline" className="flex-1">
+        <RotateCcw className="h-4 w-4 mr-2" />
+        Reset
       </Button>
     </div>
   );

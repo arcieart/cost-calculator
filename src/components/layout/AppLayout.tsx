@@ -6,7 +6,9 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">{children}</div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-accent/5">
+      {children}
+    </div>
   );
 }
 
@@ -16,8 +18,8 @@ interface MainContentProps {
 
 export function MainContent({ children }: MainContentProps) {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {children}
-    </div>
+    <main className="container mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-6xl mx-auto">{children}</div>
+    </main>
   );
 }

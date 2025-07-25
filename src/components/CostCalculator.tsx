@@ -4,6 +4,15 @@ import React from "react";
 import { useAuth } from "../contexts/AuthContext";
 import ExportOptions from "./ExportOptions";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Calculator,
+  Settings,
+  TrendingUp,
+  History,
+  Package,
+  Briefcase,
+} from "lucide-react";
 
 // Layout components
 import { AppLayout, MainContent } from "./layout/AppLayout";
@@ -76,140 +85,180 @@ export default function CostCalculator() {
       />
 
       <MainContent>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* Left Column - Input Forms */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Product Information */}
-            <ProductInfoForm
-              productName={formData.productName}
-              onProductNameChange={(value) =>
-                handleInputChange("productName", value)
-              }
-            />
+          <div className="xl:col-span-2 space-y-6">
+            {/* Product Information Section */}
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Package className="h-4 w-4 text-primary" />
+                <h2 className="text-lg font-semibold">Product Information</h2>
+              </div>
+              <ProductInfoForm
+                productName={formData.productName}
+                onProductNameChange={(value) =>
+                  handleInputChange("productName", value)
+                }
+              />
+            </div>
 
-            {/* Material Costs */}
-            <MaterialCostsForm
-              filamentType={formData.filamentType}
-              materialCostPerKg={formData.materialCostPerKg}
-              materialWeightUsed={formData.materialWeightUsed}
-              packagingCost={formData.packagingCost}
-              onFilamentTypeChange={(value) =>
-                handleInputChange("filamentType", value)
-              }
-              onMaterialCostChange={(value) =>
-                handleInputChange("materialCostPerKg", value)
-              }
-              onMaterialWeightChange={(value) =>
-                handleInputChange("materialWeightUsed", value)
-              }
-              onPackagingCostChange={(value) =>
-                handleInputChange("packagingCost", value)
-              }
-            />
+            {/* Cost Components Section */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Settings className="h-4 w-4 text-primary" />
+                <h2 className="text-lg font-semibold">Cost Components</h2>
+              </div>
 
-            {/* Time & Machine Costs */}
-            <TimeMachineCostsForm
-              printTimeMinutes={formData.printTimeMinutes}
-              machineHourlyRate={formData.machineHourlyRate}
-              electricityCostPerHour={formData.electricityCostPerHour}
-              setupTimeMinutes={formData.setupTimeMinutes}
-              onPrintTimeChange={(value) =>
-                handleInputChange("printTimeMinutes", value)
-              }
-              onMachineRateChange={(value) =>
-                handleInputChange("machineHourlyRate", value)
-              }
-              onElectricityCostChange={(value) =>
-                handleInputChange("electricityCostPerHour", value)
-              }
-              onSetupTimeChange={(value) =>
-                handleInputChange("setupTimeMinutes", value)
-              }
-            />
+              {/* Material Costs */}
+              <MaterialCostsForm
+                filamentType={formData.filamentType}
+                materialCostPerKg={formData.materialCostPerKg}
+                materialWeightUsed={formData.materialWeightUsed}
+                packagingCost={formData.packagingCost}
+                onFilamentTypeChange={(value) =>
+                  handleInputChange("filamentType", value)
+                }
+                onMaterialCostChange={(value) =>
+                  handleInputChange("materialCostPerKg", value)
+                }
+                onMaterialWeightChange={(value) =>
+                  handleInputChange("materialWeightUsed", value)
+                }
+                onPackagingCostChange={(value) =>
+                  handleInputChange("packagingCost", value)
+                }
+              />
 
-            {/* Labor Costs */}
-            <LaborCostsForm
-              designTimeMinutes={formData.designTimeMinutes}
-              postProcessingTimeMinutes={formData.postProcessingTimeMinutes}
-              hourlyLaborRate={formData.hourlyLaborRate}
-              onDesignTimeChange={(value) =>
-                handleInputChange("designTimeMinutes", value)
-              }
-              onPostProcessingTimeChange={(value) =>
-                handleInputChange("postProcessingTimeMinutes", value)
-              }
-              onHourlyLaborRateChange={(value) =>
-                handleInputChange("hourlyLaborRate", value)
-              }
-            />
+              {/* Time & Machine Costs */}
+              <TimeMachineCostsForm
+                printTimeMinutes={formData.printTimeMinutes}
+                machineHourlyRate={formData.machineHourlyRate}
+                electricityCostPerHour={formData.electricityCostPerHour}
+                setupTimeMinutes={formData.setupTimeMinutes}
+                onPrintTimeChange={(value) =>
+                  handleInputChange("printTimeMinutes", value)
+                }
+                onMachineRateChange={(value) =>
+                  handleInputChange("machineHourlyRate", value)
+                }
+                onElectricityCostChange={(value) =>
+                  handleInputChange("electricityCostPerHour", value)
+                }
+                onSetupTimeChange={(value) =>
+                  handleInputChange("setupTimeMinutes", value)
+                }
+              />
 
-            {/* Accessories */}
-            <AccessoriesForm
-              accessories={formData.accessories}
-              onAccessoryChange={handleAccessoryChange}
-            />
+              {/* Labor Costs */}
+              <LaborCostsForm
+                designTimeMinutes={formData.designTimeMinutes}
+                postProcessingTimeMinutes={formData.postProcessingTimeMinutes}
+                hourlyLaborRate={formData.hourlyLaborRate}
+                onDesignTimeChange={(value) =>
+                  handleInputChange("designTimeMinutes", value)
+                }
+                onPostProcessingTimeChange={(value) =>
+                  handleInputChange("postProcessingTimeMinutes", value)
+                }
+                onHourlyLaborRateChange={(value) =>
+                  handleInputChange("hourlyLaborRate", value)
+                }
+              />
 
-            {/* Business Costs */}
-            <BusinessCostsForm
-              overheadPercentage={formData.overheadPercentage}
-              failureWasteRate={formData.failureWasteRate}
-              desiredProfitMargin={formData.desiredProfitMargin}
-              onOverheadPercentageChange={(value) =>
-                handleInputChange("overheadPercentage", value)
-              }
-              onFailureWasteRateChange={(value) =>
-                handleInputChange("failureWasteRate", value)
-              }
-              onDesiredProfitMarginChange={(value) =>
-                handleInputChange("desiredProfitMargin", value)
-              }
-            />
+              {/* Accessories */}
+              <AccessoriesForm
+                accessories={formData.accessories}
+                onAccessoryChange={handleAccessoryChange}
+              />
+            </div>
 
-            {/* Wholesale Options */}
-            <WholesaleOptionsForm
-              isWholesale={formData.isWholesale || false}
-              quantity={formData.quantity || 1}
-              onIsWholesaleChange={(value) =>
-                handleInputChange("isWholesale", value)
-              }
-              onQuantityChange={(value) => handleInputChange("quantity", value)}
-            />
+            {/* Business Strategy Section */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Briefcase className="h-4 w-4 text-primary" />
+                <h2 className="text-lg font-semibold">Business Strategy</h2>
+              </div>
+
+              {/* Business Costs */}
+              <BusinessCostsForm
+                overheadPercentage={formData.overheadPercentage}
+                failureWasteRate={formData.failureWasteRate}
+                desiredProfitMargin={formData.desiredProfitMargin}
+                onOverheadPercentageChange={(value) =>
+                  handleInputChange("overheadPercentage", value)
+                }
+                onFailureWasteRateChange={(value) =>
+                  handleInputChange("failureWasteRate", value)
+                }
+                onDesiredProfitMarginChange={(value) =>
+                  handleInputChange("desiredProfitMargin", value)
+                }
+              />
+
+              {/* Wholesale Options */}
+              <WholesaleOptionsForm
+                isWholesale={formData.isWholesale || false}
+                quantity={formData.quantity || 1}
+                onIsWholesaleChange={(value) =>
+                  handleInputChange("isWholesale", value)
+                }
+                onQuantityChange={(value) =>
+                  handleInputChange("quantity", value)
+                }
+              />
+            </div>
 
             {/* Action Buttons */}
-            <ActionButtons
-              onSave={handleSaveCalculation}
-              onReset={resetForm}
-              isLoading={historyLoading}
-            />
+            <div className="pt-4">
+              <ActionButtons
+                onSave={handleSaveCalculation}
+                onReset={resetForm}
+                isLoading={historyLoading}
+              />
+            </div>
           </div>
 
           {/* Right Column - Results and History */}
-          <div className="space-y-6">
-            {/* Cost Breakdown */}
-            <CostBreakdown
-              calculations={calculations}
-              isWholesale={formData.isWholesale || false}
-              quantity={formData.quantity || 1}
-            />
+          <div className="space-y-5">
+            {/* Results Section */}
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <TrendingUp className="h-4 w-4 text-primary" />
+                <h2 className="text-lg font-semibold">Pricing Results</h2>
+              </div>
 
-            {/* Export Options */}
-            {formData.productName && (
-              <Card>
-                <CardContent>
-                  <ExportOptions
-                    productName={formData.productName}
-                    calculations={calculations}
-                    formData={formData}
-                  />
-                </CardContent>
-              </Card>
-            )}
+              {/* Cost Breakdown */}
+              <CostBreakdown
+                calculations={calculations}
+                isWholesale={formData.isWholesale || false}
+                quantity={formData.quantity || 1}
+              />
 
-            {/* History */}
-            <CalculationHistory
-              history={history}
-              onLoadFromHistory={loadFromHistory}
-            />
+              {/* Export Options */}
+              {formData.productName && (
+                <Card className="border-dashed border-primary/20 bg-primary/5">
+                  <CardContent className="pt-4">
+                    <ExportOptions
+                      productName={formData.productName}
+                      calculations={calculations}
+                      formData={formData}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* History Section */}
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <History className="h-4 w-4 text-primary" />
+                <h2 className="text-lg font-semibold">Calculation History</h2>
+              </div>
+              <CalculationHistory
+                history={history}
+                onLoadFromHistory={loadFromHistory}
+              />
+            </div>
           </div>
         </div>
       </MainContent>
