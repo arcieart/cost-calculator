@@ -1,6 +1,5 @@
 import * as XLSX from 'xlsx';
-import { ProductCost, CalculationResults } from '../types/product';
-import { formatCurrency } from './formatters';
+import { ProductCost } from '../types/product';
 import { Timestamp } from 'firebase/firestore';
 import { calculateCosts } from './calculations';
 
