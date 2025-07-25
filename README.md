@@ -1,36 +1,117 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cost Calculator
+
+A comprehensive web application for calculating product pricing and manufacturing costs. Built for makers, artisans, and small businesses to accurately price their products by tracking materials, labor, overhead, and accessories.
+
+## Features
+
+- **Comprehensive Cost Tracking**
+
+  - Material costs with quantity calculations
+  - Labor and time tracking
+  - Machine/tool costs
+  - Business overhead expenses
+  - Accessories and add-ons
+  - Wholesale pricing options
+
+- **User Management**
+
+  - Secure Firebase authentication
+  - Personal calculation history
+  - Data persistence across sessions
+
+- **Analysis & Export**
+
+  - Detailed cost breakdowns
+  - Historical calculation tracking
+  - Export functionality for pricing data
+  - Visual cost analysis
+
+- **Modern UI/UX**
+  - Dark/light mode toggle
+  - Responsive design
+  - Interactive tooltips and helpers
+  - Clean, professional interface
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS, Radix UI components
+- **Backend**: Firebase/Firestore
+- **Authentication**: Firebase Auth
+- **Icons**: Lucide React
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js (v18 or higher)
+- Yarn or npm
+- Firebase project setup
+
+### Installation
+
+1. Clone the repository:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd cost-calc
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+yarn install
+# or
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Set up Firebase configuration:
 
-## Learn More
+   - Create a Firebase project
+   - Enable Authentication and Firestore
+   - Add your Firebase config to `firebase.ts`
 
-To learn more about Next.js, take a look at the following resources:
+4. Run the development server:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+yarn dev
+# or
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Deploy on Vercel
+## Usage
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Sign In**: Create an account or sign in with your credentials
+2. **Product Setup**: Enter basic product information
+3. **Cost Entry**: Add costs for materials, labor, overhead, and accessories
+4. **Calculate**: View detailed pricing breakdown and profit margins
+5. **Save & Export**: Save calculations to history and export pricing data
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project Structure
+
+```
+src/
+├── app/                 # Next.js app router pages
+├── components/          # React components
+│   ├── forms/          # Cost input forms
+│   ├── layout/         # Layout components
+│   ├── results/        # Results display components
+│   └── ui/             # Reusable UI components
+├── contexts/           # React contexts
+├── hooks/              # Custom React hooks
+├── lib/                # Utility functions
+├── services/           # External service integrations
+└── types/              # TypeScript type definitions
+```
+
+## Scripts
+
+- `yarn dev` - Start development server
+- `yarn build` - Build for production
+- `yarn start` - Start production server
+
+## Contributing
+
+This is a personal project, but feel free to fork and adapt for your own use cases.
