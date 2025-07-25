@@ -24,19 +24,19 @@ export const ACCESSORY_CONFIGS: Record<AccessoryType, AccessoryConfig> = {
 export const DEFAULT_ACCESSORIES: Record<AccessoryType, Accessory> = {
   keychain: {
     type: 'keychain',
-    quantity: 0,
+    quantity: 1,
     unitCost: ACCESSORY_CONFIGS.keychain.defaultCost,
     enabled: false
   },
   magnet: {
     type: 'magnet',
-    quantity: 0,
+    quantity: 1,
     unitCost: ACCESSORY_CONFIGS.magnet.defaultCost,
     enabled: false
   },
   bolt: {
     type: 'bolt',
-    quantity: 0,
+    quantity: 1,
     unitCost: ACCESSORY_CONFIGS.bolt.defaultCost,
     enabled: false
   }
