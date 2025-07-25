@@ -228,7 +228,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
             <div className="pt-6 border-t">
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-center">
-                  What you'll get:
+                  What you&apos;ll get:
                 </h3>
                 <div className="grid grid-cols-1 gap-2 text-xs text-muted-foreground">
                   <div className="flex items-center space-x-2">
