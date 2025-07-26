@@ -17,20 +17,15 @@ export interface BatchEfficiencyTier {
 // Volume discount configuration - affects profit margin
 export const VOLUME_DISCOUNT_TIERS: VolumeDiscountTier[] = [
   {
-    minQuantity: 200,
-    discountPercentage: 0.4, // 40% discount for 200+ units
-    description: "Large wholesale (200+ units)"
-  },
-  {
     minQuantity: 50,
     maxQuantity: 199,
-    discountPercentage: 0.3, // 30% discount for 50-199 units
+    discountPercentage: 0.2, // 20% discount for 50-199 units
     description: "Medium wholesale (50-199 units)"
   },
   {
     minQuantity: 10,
     maxQuantity: 49,
-    discountPercentage: 0.2, // 20% discount for 10-49 units
+    discountPercentage: 0.1, // 10% discount for 10-49 units
     description: "Small wholesale (10-49 units)"
   }
 ];
@@ -96,6 +91,6 @@ export const getVolumeDiscountDescription = (quantity: number): string | null =>
 export const WHOLESALE_CONFIG = {
   MIN_WHOLESALE_QUANTITY: 10,
   MINIMUM_PROFIT_MARGIN: 15, // Minimum profit margin percentage for wholesale
-  BULK_PACKAGING_DISCOUNT: 0.4, // 40% reduction for bulk packaging
-  BULK_PACKAGING_MIN_QUANTITY: 10,
+  // BULK_PACKAGING_DISCOUNT: 0.4, // 40% reduction for bulk packaging
+  // BULK_PACKAGING_MIN_QUANTITY: 10,
 } as const; 

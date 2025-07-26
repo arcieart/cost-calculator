@@ -1,5 +1,5 @@
 import { ProductCost, CalculationResults } from "../types/product";
-import { getVolumeDiscount, getBatchEfficiencyFactor, WHOLESALE_CONFIG } from "../config/wholesale";
+import { getBatchEfficiencyFactor, getVolumeDiscount, WHOLESALE_CONFIG } from "../config/wholesale";
 
 export function calculateMaterialCost(formData: ProductCost): number {
   return (formData.materialWeightUsed / 1000) * formData.materialCostPerKg;
@@ -37,13 +37,13 @@ export function calculateAccessoriesCost(formData: ProductCost): number {
 }
 
 export function calculatePackagingCost(formData: ProductCost): number {
-  const quantity = formData.quantity || 1;
-  const isWholesale = formData.isWholesale;
+  // const quantity = formData.quantity || 1;
+  // const isWholesale = formData.isWholesale;
   
-  // Apply bulk packaging discount for large wholesale orders
-  if (isWholesale && quantity >= WHOLESALE_CONFIG.BULK_PACKAGING_MIN_QUANTITY) {
-    return formData.packagingCost * (1 - WHOLESALE_CONFIG.BULK_PACKAGING_DISCOUNT);
-  }
+  // // Apply bulk packaging discount for large wholesale orders
+  // if (isWholesale && quantity >= WHOLESALE_CONFIG.BULK_PACKAGING_MIN_QUANTITY) {
+  //   return formData.packagingCost * (1 - WHOLESALE_CONFIG.BULK_PACKAGING_DISCOUNT);
+  // }
   
   return formData.packagingCost;
 }
