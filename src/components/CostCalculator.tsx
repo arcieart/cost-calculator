@@ -21,7 +21,7 @@ import { TimeMachineCostsForm } from "./forms/TimeMachineCostsForm";
 import { LaborCostsForm } from "./forms/LaborCostsForm";
 import { AccessoriesForm } from "./forms/AccessoriesForm";
 import { BusinessCostsForm } from "./forms/BusinessCostsForm";
-import { WholesaleOptionsForm } from "./forms/WholesaleOptionsForm";
+
 import { ActionButtons } from "./forms/ActionButtons";
 
 // Result components
@@ -93,8 +93,16 @@ export default function CostCalculator() {
               </div>
               <ProductInfoForm
                 productName={formData.productName}
+                isWholesale={formData.isWholesale || false}
+                quantity={formData.quantity || 1}
                 onProductNameChange={(value) =>
                   handleInputChange("productName", value)
+                }
+                onIsWholesaleChange={(value) =>
+                  handleInputChange("isWholesale", value)
+                }
+                onQuantityChange={(value) =>
+                  handleInputChange("quantity", value)
                 }
               />
             </div>
@@ -191,18 +199,6 @@ export default function CostCalculator() {
                   handleInputChange("desiredProfitMargin", value)
                 }
               />
-
-              {/* Wholesale Options */}
-              <WholesaleOptionsForm
-                isWholesale={formData.isWholesale || false}
-                quantity={formData.quantity || 1}
-                onIsWholesaleChange={(value) =>
-                  handleInputChange("isWholesale", value)
-                }
-                onQuantityChange={(value) =>
-                  handleInputChange("quantity", value)
-                }
-              />
             </div>
 
             {/* Action Buttons */}
@@ -229,6 +225,8 @@ export default function CostCalculator() {
                 calculations={calculations}
                 isWholesale={formData.isWholesale || false}
                 quantity={formData.quantity || 1}
+                formData={formData}
+                originalProfitMargin={formData.desiredProfitMargin}
               />
             </div>
 

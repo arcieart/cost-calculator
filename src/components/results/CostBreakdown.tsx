@@ -1,21 +1,27 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalculationResults } from "../../types/product";
+import { CalculationResults, ProductCost } from "../../types/product";
 import { formatCurrency } from "../../lib/formatters";
 import { getVolumeDiscount, WHOLESALE_CONFIG } from "../../config/wholesale";
+import { calculateCosts } from "../../lib/calculations";
 import { Calculator, IndianRupee, TrendingUp } from "lucide-react";
 
 interface CostBreakdownProps {
   calculations: CalculationResults;
   isWholesale: boolean;
   quantity: number;
+  // Add formData to calculate retail price correctly
+  formData: ProductCost;
+  originalProfitMargin?: number;
 }
 
 export function CostBreakdown({
   calculations,
   isWholesale,
   quantity,
+  formData,
+  originalProfitMargin,
 }: CostBreakdownProps) {
   const costItems = [
     {
@@ -43,6 +49,26 @@ export function CostBreakdown({
       value: calculations.wasteAllowance,
     },
   ];
+
+  // Calculate retail price for comparison when showing wholesale
+  const getRetailPrice = () => {
+    if (!isWholesale) return null;
+
+    // Create retail version of formData and calculate proper retail price
+    const retailFormData: ProductCost = {
+      ...formData,
+      isWholesale: false,
+      quantity: 1,
+    };
+
+    const retailCalculations = calculateCosts(retailFormData);
+    return retailCalculations.sellingPrice;
+  };
+
+  const retailPrice = getRetailPrice();
+  const totalDiscountPercentage = retailPrice
+    ? ((retailPrice - calculations.sellingPrice) / retailPrice) * 100
+    : 0;
 
   return (
     <Card>
@@ -138,14 +164,26 @@ export function CostBreakdown({
                 </div>
               </div>
 
-              {quantity >= WHOLESALE_CONFIG.MIN_WHOLESALE_QUANTITY && (
+              {/* Total Discount Information */}
+              {retailPrice && totalDiscountPercentage > 0 && (
                 <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <Badge variant="secondary" className="mb-1">
-                    Volume Discount
-                  </Badge>
-                  <div className="text-sm text-blue-700 dark:text-blue-300">
-                    {Math.round(getVolumeDiscount(quantity) * 100)}% discount
-                    applied
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                      Total Wholesale Discount
+                    </span>
+                    <Badge
+                      variant="secondary"
+                      className="bg-blue-100 dark:bg-blue-800"
+                    >
+                      {totalDiscountPercentage.toFixed(1)}% off
+                    </Badge>
+                  </div>
+                  <div className="text-xs text-blue-600 dark:text-blue-400 space-y-1">
+                    <div>Retail Price: {formatCurrency(retailPrice)}</div>
+                    <div>
+                      You Save:{" "}
+                      {formatCurrency(retailPrice - calculations.sellingPrice)}
+                    </div>
                   </div>
                 </div>
               )}
